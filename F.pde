@@ -22,6 +22,7 @@ float[] dy = {0,0,0,0,0};
 float tside = 30;//length of equilateral triangle's side
 float desc = 30;//amount of descension for equilateral triangle
 float[] triangle = {0,0,0,0,0,0};//equilateral triangle coordinates
+PFont font;
 
 void setup() {
   size(1366, 768,P3D);//monitor size
@@ -30,6 +31,7 @@ void setup() {
   stroke(32,194,14);//line color
   strokeWeight(8);//line thickness
   smooth();
+  font = createFont("RussoOne-Regular.ttf",90);
 }
 
 void grid(float x, float y, float tx, float ty, float rx, float ry, float rz){
@@ -50,7 +52,7 @@ void grid(float x, float y, float tx, float ty, float rx, float ry, float rz){
     popMatrix();
 }
 
-void conc(float x, float y, float scale,float weight({
+void conc(float x, float y, float scale,float weight){
   pushStyle();//ensures that stroke weight only changes for this object
   strokeWeight(weight);
   int step = 50;//spacing between circles
@@ -166,7 +168,7 @@ void draw(){
       ellipse(dx[i],dy[i],size[i],size[i]);
     }
     for(int i = 0; i < 5; i++){
-      if(size[i]>100)size[i]--;
+      if(size[i]>100)size[i]-=5;
     }
     //TRIANGLE
     if(size[0]<300){
@@ -183,7 +185,8 @@ void draw(){
             textSize(100);
             fill(32,194,14);
             textAlign(CENTER);
-            text("WELCOME",width/2,150);//todo: change font
+            textFont(font);
+            text("WELCOME",width/2,150);
             popStyle();
         }
     }
