@@ -3,7 +3,7 @@ float y = 0;
 float rx = 0;//grid's x rotation
 float spacing = 195.14; //spacing in between grid lines
 float ty = 0;//grid's y offset
-float tya = 300;//secondary grid's secondary y offset
+float tya = 400;//secondary grid's initial y offset
 boolean b1 = false;
 boolean b2 = false;
 boolean b3 = false;
@@ -15,7 +15,6 @@ float radius = 300;//radius of circle around which concentric circles rotate
 float alpha = 0;//angle of concentric circle's rotation
 float weight = 8;//concentric circle's line weight
 float ls = 0;//line start point
-float le = 0;//line end point
 float[] size = {75,150,225,300,375};//radii of concentric circles
 float[] dx = {0,0,0,0,0};//coordinates of circles
 float[] dy = {0,0,0,0,0};
@@ -23,10 +22,13 @@ float tside = 30;//length of equilateral triangle's side
 float desc = 30;//amount of descension for equilateral triangle
 float[] triangle = {0,0,0,0,0,0};//equilateral triangle coordinates
 PFont font;
+int bgr = 0;//background colors in rgb
+int bgg = 20;
+int bgb = 0;
 
 void setup() {
   size(1366, 768,P3D);//monitor size
-  background(0,20,0);//rgb values for bg
+  background(bgr,bgg,bgb);//rgb values for bg
   noFill();//doesn't fill in shapes
   stroke(32,194,14);//line color
   strokeWeight(8);//line thickness
@@ -66,7 +68,7 @@ void conc(float x, float y, float scale,float weight){
 
 
 void draw(){
-  background(0,20,0);//refreshes bg every frame
+  background(bgr,bgg,bgb);//refreshes bg every frame
   //DRAW GRID
   if(x<height|| y<width){
     grid(x,y,0,0,0,0,0);
@@ -87,10 +89,10 @@ void draw(){
       grid(height*2,width*2,-width/2,ty,rx,0,0);
       angle-=0.5;
     }
-    //AT ANGLE = -160, DRAW SECONDARY GRID
-    if((angle<=-140)&&(angle>=-360)){
+    //AT ANGLE = -130, DRAW SECONDARY GRID
+    if((angle<=-130)&&(angle>=-360)){
       grid(height*2,width*2,width/2,-ty-tya,-rx,0,radians(180));
-      if(tya>=0)tya-=5;//makes secondadry grid rise from offscreen
+      if(tya>=0)tya-=5;//makes secondadry grid rise from tya offscreen
     }
     if((ty<=height/3)&&(angle>=-360))ty+=5; 
       else b1=true;
@@ -103,6 +105,7 @@ void draw(){
       if(rx <= PI/2-radians(1.5)) rx+=0.01;
     }
      popMatrix();
+     
     //CIRCLE MOVEMENT
     if((cy<height/2+radius)&&(cx<width/2)){//initial linear movement phase
       conc(cx,cy,scale,weight);
@@ -125,16 +128,11 @@ void draw(){
   //DRAWS LINE INSTEAD OF MERGED GRIDS AND SHRINKS IT INTO CIRCLE
   if((angle<=-360)&&(rx >= PI/2-radians(1.5))){
     b1=true;
-    background(0,20,0);
+    background(bgr,bgg,bgb);
     conc(width/2,height/2,scale,weight);
-    if(ls==0){
-      le=width*2;//makes the animation delay a bit so we see the straight line
-      //todo: reduce amount of delay
-      ls = -width;
-    }
-    line(ls,height/2,le,height/2);
+    if(ls==0) ls = -width+500;//todo: reduce amount of delay
+    line(ls,height/2,width-ls,height/2);
     if(ls <= width/2)ls+=10;
-    if(le >= width/2)le-=10;
     //returns normal weight and scale
     if(ls >= 0){
       if(scale<=1.5)scale+=0.01;
@@ -143,7 +141,7 @@ void draw(){
   }
   
   if((weight<=8)&&(angle<=-360)&&(b2)){
-    background(0,20,0);
+    background(bgr,bgg,bgb);
     for(int i = 0; i < 5; i++){
       ellipse(dx[i],dy[i],size[i],size[i]);
     }
@@ -158,9 +156,9 @@ void draw(){
     if(dx[3]<=3*width/4-75)dx[3]+=2;//lower right
     if(dy[3]<=3*height/4-75)dy[3]++;
     if(dx[4]>=width/4+75)dx[4]-=2;//lower left
-    else b2 = false;
+      else b2 = false;  
     if(dy[4]<=3*height/4-75)dy[4]++;
-    else b1 = false;
+      else b1 = false;
   }
   
   if(dx[1]>=3*width/4-75){
@@ -172,23 +170,23 @@ void draw(){
     }
     //TRIANGLE
     if(size[0]<300){
-        triangle(width/2 + triangle[0],height/2+triangle[1]+desc,width/2+triangle[2],height/2+triangle[3]+desc,width/2+triangle[4],height/2+triangle[5]+desc);
-        triangle[1] = sqrt(pow(tside,2)-pow(tside/2,2))/2;
-        triangle[2] = -tside/2;
-        triangle[3] = -sqrt(pow(tside,2)-pow(tside/2,2))/2;
-        triangle[4] = tside/2;
-        triangle[5] = -sqrt(pow(tside,2)-pow(tside/2,2))/2;
-        if(tside <= 230) tside+=5;
-        //WELCOME
-        if(tside >= 220){
-            pushStyle();
-            textSize(100);
-            fill(32,194,14);
-            textAlign(CENTER);
-            textFont(font);
-            text("WELCOME",width/2,150);
-            popStyle();
-        }
+      triangle(width/2 + triangle[0],height/2+triangle[1]+desc,width/2+triangle[2],height/2+triangle[3]+desc,width/2+triangle[4],height/2+triangle[5]+desc);
+      triangle[1] = sqrt(pow(tside,2)-pow(tside/2,2))/2;
+      triangle[2] = -tside/2;
+      triangle[3] = -sqrt(pow(tside,2)-pow(tside/2,2))/2;
+      triangle[4] = tside/2;
+      triangle[5] = -sqrt(pow(tside,2)-pow(tside/2,2))/2;
+      if(tside <= 230) tside+=5;
+      //WELCOME
+      if(tside >= 220){
+        pushStyle();
+        textSize(100);
+        fill(32,194,14);
+        textAlign(CENTER);
+        textFont(font);
+        text("WELCOME",width/2,150);
+        popStyle();
+      }
     }
   }
 }
