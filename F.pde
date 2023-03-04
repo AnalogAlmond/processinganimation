@@ -26,13 +26,13 @@ int bgb = 0;
 
 void setup() {
   size(1366, 768,P3D);//monitor size
-  background(bgr,bgg,bgb);//rgb values for bg
+  background(bgr,bgg,bgb);
   noFill();//doesn't fill in shapes
   stroke(32,194,14);//line color
   strokeWeight(8);//line thickness
   smooth();
   font = createFont("RussoOne-Regular.ttf",90);
-  //frameRate(24);
+  frameRate(30);
 }
 
 void grid(float x, float y, float tx, float ty, float rx, float ry, float rz){
@@ -71,8 +71,11 @@ void draw(){
   //DRAW GRID
   if(x<=height || y<=width){
     grid(x,y,0,0,0,0,0);
-    if(x<=height)x+=height/27;
-    if(y<=width)y+=width/27;
+    if(x<=height)x+=height/5/2.5;
+    if(y<=width)y+=width/5/2.5;
+    
+    //initializing some values
+    ls = -width/4;
     ty = -height / 2;
     for(int i = 0; i < 5; i++){
       dx[i]=width/2;
@@ -86,102 +89,101 @@ void draw(){
     rotateZ(radians(angle));
     if(angle>=-360){
       grid(height*2,width*2,-width/2,ty,rx,0,0);
-      angle -= 360.0/720;
+      angle -= 360.0/36/3;
+      //AT ANGLE = -150, DRAW SECONDARY GRID
+      if(angle<=-150){
+        grid(height*2,width*2,width/2,-ty-tya,-rx,0,radians(180));
+        if(tya>=0) tya-=400/8/2.5;//makes secondadry grid rise from tya offscreen  
+      }
+      if(ty<=height/3) ty+=(height/2+height/3)/8/2.5;
+      if(rx<=PI/3) rx+=PI/3/6/2.5;
     }
-    //AT ANGLE = -130, DRAW SECONDARY GRID
-    if((angle<=-130)&&(angle>=-360)){
-      grid(height*2,width*2,width/2,-ty-tya,-rx,0,radians(180));
-      if(tya>=0)tya-=400/80;//makes secondadry grid rise from tya offscreen
-    }
-    if((ty<=height/3)&&(angle>=-360))ty+=5; 
-      //else b1=true;
-    if((rx<=PI/3)&&(angle>=-360))rx+=0.01; 
-      //else b2=true;
-    if(angle<=-360){//after a full rotation is completed, make grids rise
+    else{//after a full rotation is completed, make grids rise
       grid(height*2,width*2,-width/2,ty,rx,0,0);
       grid(height*2,width*2,width/2,-ty,-rx,0,radians(180));
-      if(ty>0)ty-=10;
-      if(rx <= PI/2) rx+=PI/2/(25*PI);
+      if(ty>=0) ty-=height/3/8/2.0;
+      if(rx <= PI/2) rx+=(PI/2-PI/3)/8/2.0;
     }
      popMatrix();
      
-    //CIRCLE MOVEMENT
+    //INITIAL LINEAR CIRCLE MOVEMENT
     if((cy<=height/2+radius)&&(cx<=width/2)){//initial linear movement phase
       conc(cx,cy,scale,weight);
-      cy+=(height/2+radius)/110;
-      cx+=(width/2)/110;
+      cy+=(height/2+radius)/14/2.5;
+      cx+=(width/2)/14/2.5;
     }
    else{
       //CIRCLE ROTATION
       conc(width/2+sin(alpha)*radius,height/2+cos(alpha)*radius,scale,weight);
-      if(radius>0) radius-=0.5;
-      if(alpha<2*PI)alpha+=radians(360.0/720);
+      if(radius>0) radius-=230/25/2.5;
+      if(alpha<2*PI)alpha+=radians(360.0/18/3);
     }
-    if((scale>=1)&&(angle>-360))scale-=1.0/200;//gradually shrinks circles
+    if((scale>=1)&&(angle>-360))scale-=1.0/30/2.5;//gradually shrinks circles
     //AT ANGLE = -270, ENLARGE CONCENTRIC CIRCLES' THICKNESS
-    if(angle<=-270){
-      if(weight<50)weight+=42.0/84;
+    if((angle<=-270)&&(angle>=-360)){
+      if(weight<50)weight+=42.0/12/2;
     }
   }
   
-  //DRAWS LINE INSTEAD OF MERGED GRIDS AND SHRINKS IT INTO CIRCLE
-  if((angle<=-360)&&(rx >= PI/2-radians(1.5))){
-    background(bgr,bgg,bgb);
-    conc(width/2,height/2,scale,weight);
-    if(ls==0) ls = -width/4;//delay
-    line(ls,height/2,width-ls,height/2);
-    if(ls <= width/2)ls+=10;
-    //returns normal weight and scale
-    if(ls > 0){
-      if(scale<=1.5)scale+=0.5/50;
-      if(weight>=8)weight-=42.0/42;
+  if(angle<=-360){
+    //DRAWS LINE INSTEAD OF MERGED GRIDS AND SHRINKS IT INTO CIRCLE
+    if(rx >= PI/2){
+      background(bgr,bgg,bgb);
+      conc(width/2,height/2,scale,weight);
+      line(ls,height/2,width-ls,height/2);
+      if((ls <= width/2-100)) ls+=(width/2+width/4)/7/2;
+      else ls = width/2;
+      if(ls >= 0){//returns normal weight and scale
+        if(scale<=1.5)scale+=0.5/8/2.5;
+        if(weight>=8)weight-=42.0/8/2.5;
+      }
     }
-  }
-  
-  if((weight<=8)&&(angle<=-360)){
-    background(bgr,bgg,bgb);
-    for(int i = 0; i < 5; i++){
-      ellipse(dx[i],dy[i],size[i],size[i]);
+    
+    if(weight<=8){
+      background(bgr,bgg,bgb);
+      for(int i = 0; i < 5; i++){
+        ellipse(dx[i],dy[i],size[i],size[i]);
+      }
+      //ENLARGE AND SPLIT CIRCLES
+      for(int i = 0; i < 5; i++){
+        if((size[i] < 400) && (dx[1] <= 3 * width / 4 - 75)) size[i] += (5-i)*4;//makes sure they all grow in proportional speeds
+      }
+        if(dx[1] < 3*width/4-75)   dx[1]+=(((3*width/4-75)-width/2)/8.0)*4/10;//upper right
+        if(dy[1] > height/4+75)    dy[1]-=(height/4+75+height/2)/8/10;
+        if(dx[2] > width/4+75)     dx[2]-=((width/4+75)+(width/2))/8/10;//upper left
+        if(dy[2] > height/4+75)    dy[2]-=((height/4+75)+(height/2))/8/10;
+        if(dx[3] < 3*width/4-75)   dx[3]+=((3*width/4-75)-width/2)/8.0*4/10;//lower right
+        if(dy[3] < 3*height/4-75)  dy[3]+=((3*height/4-75)-height/2)/8.0*4/10;
+        if(dx[4] > width/4+75)     dx[4]-=(width/4+75+width/2)/8/10;//lower left
+        if(dy[4] < 3*height/4-75)  dy[4]+=((3*height/4-75)-(height/2))/8.0*4/10;
     }
-    //ENLARGE AND SPLIT CIRCLES
-    for(int i = 0; i < 5; i++){
-      if((size[i] < 400) && (dx[1] <= 3 * width / 4 - 75)) size[i] += (5-i);//makes sure they all grow in proportional speeds
-    }
-    if(dx[1] <= 3*width/4-75) dx[1]+=2;//upper right
-    if(dy[1] >= height/4+75)  dy[1]--;
-    if(dx[2] >= width/4+75)   dx[2]-=2;//upper left
-    if(dy[2] >= height/4+75)  dy[2]--;
-    if(dx[3] <= 3*width/4-75) dx[3]+=2;//lower right
-    if(dy[3] <= 3*height/4-75)dy[3]++;
-    if(dx[4] >= width/4+75)   dx[4]-=2;//lower left
-    if(dy[4] <= 3*height/4-75)dy[4]++;
-  }
-  
-  if(dx[1]>=3*width/4-75){
-    for(int i = 0; i < 5; i++){
-      ellipse(dx[i],dy[i],size[i],size[i]);
-    }
-    for(int i = 0; i < 5; i++){
-      if(size[i]>100)size[i]-=300.0/60;
-    }
-    //TRIANGLE
-    if(size[0]<300){
-      triangle(width/2 + triangle[0],height/2+triangle[1]+desc,width/2+triangle[2],height/2+triangle[3]+desc,width/2+triangle[4],height/2+triangle[5]+desc);
-      triangle[1] = sqrt(pow(tside,2)-pow(tside/2,2))/2;
-      triangle[2] = -tside/2;
-      triangle[3] = -sqrt(pow(tside,2)-pow(tside/2,2))/2;
-      triangle[4] = tside/2;
-      triangle[5] = -sqrt(pow(tside,2)-pow(tside/2,2))/2;
-      if(tside <= 230) tside+=200/40;
-      //WELCOME
-      if(tside >= 220){
-        pushStyle();
-        textSize(100);
-        fill(32,194,14);
-        textAlign(CENTER);
-        textFont(font);
-        text("WELCOME",width/2,150);
-        popStyle();
+    
+    if(dx[1]>=3*width/4-75){//after the circles have been split
+      for(int i = 0; i < 5; i++){
+        ellipse(dx[i],dy[i],size[i],size[i]);
+      }
+      for(int i = 0; i < 5; i++){
+        if(size[i]>100)size[i]-=300.0/12/2.5;//shrinks the circles
+      }
+      //TRIANGLE
+      if(size[0]<300){
+        triangle(width/2 + triangle[0],height/2+triangle[1]+desc,width/2+triangle[2],height/2+triangle[3]+desc,width/2+triangle[4],height/2+triangle[5]+desc);
+        triangle[1] = sqrt(pow(tside,2)-pow(tside/2,2))/2;
+        triangle[2] = -tside/2;
+        triangle[3] = -sqrt(pow(tside,2)-pow(tside/2,2))/2;
+        triangle[4] = tside/2;
+        triangle[5] = -sqrt(pow(tside,2)-pow(tside/2,2))/2;
+        if(tside <= 230) tside+=200/8/2.5;
+        //WELCOME
+        if(tside >= 220){
+          pushStyle();
+          textSize(100);
+          fill(32,194,14);
+          textAlign(CENTER);
+          textFont(font);
+          text("WELCOME",width/2,150);
+          popStyle();
+        }
       }
     }
   }
