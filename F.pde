@@ -18,6 +18,7 @@ float[] dy = {0,0,0,0,0};
 float tside = 30;//length of equilateral triangle's side
 float desc = 30;//amount of descension for equilateral triangle
 float[] triangle = {0,0,0,0,0,0};//equilateral triangle coordinates
+float offset = 0;
 
 PFont font;
 int bgr = 0;//background colors in rgb
@@ -75,6 +76,7 @@ void draw(){
     if(y<=width)y+=width/5/2.5;
     
     //initializing some values
+    offset = height/10.24;
     ls = -width/4;
     ty = -height / 2;
     for(int i = 0; i < 5; i++){
@@ -146,19 +148,19 @@ void draw(){
       }
       //ENLARGE AND SPLIT CIRCLES
       for(int i = 0; i < 5; i++){
-        if((size[i] < 400) && (dx[1] <= 3 * width / 4 - 75)) size[i] += (5-i)*4;//makes sure they all grow in proportional speeds
+        if((size[i] < 400) && (dx[1] <= 3 * width / 4 - offset)) size[i] += (5-i)*4;//makes sure they all grow in proportional speeds
       }
-        if(dx[1] < 3*width/4-75)   dx[1]+=(((3*width/4-75)-width/2)/8.0)*4/10;//upper right
-        if(dy[1] > height/4+75)    dy[1]-=(height/4+75+height/2)/8/10;
-        if(dx[2] > width/4+75)     dx[2]-=((width/4+75)+(width/2))/8/10;//upper left
-        if(dy[2] > height/4+75)    dy[2]-=((height/4+75)+(height/2))/8/10;
-        if(dx[3] < 3*width/4-75)   dx[3]+=((3*width/4-75)-width/2)/8.0*4/10;//lower right
-        if(dy[3] < 3*height/4-75)  dy[3]+=((3*height/4-75)-height/2)/8.0*4/10;
-        if(dx[4] > width/4+75)     dx[4]-=(width/4+75+width/2)/8/10;//lower left
-        if(dy[4] < 3*height/4-75)  dy[4]+=((3*height/4-75)-(height/2))/8.0*4/10;
+        if(dx[1] <= 3*width/4-offset)   dx[1]+=(((3*width/4-offset)-width/2)/8.0)*4/10;//upper right
+        if(dy[1] >= height/4+offset)    dy[1]-=(height/4+offset+height/2)/8/10;
+        if(dx[2] >= width/4+offset)     dx[2]-=((width/4+offset)+(width/2))/8/10;//upper left
+        if(dy[2] >= height/4+offset)    dy[2]-=((height/4+offset)+(height/2))/8/10;
+        if(dx[3] <= 3*width/4-offset)   dx[3]+=((3*width/4-offset)-width/2)/8.0*4/10;//lower right
+        if(dy[3] <= 3*height/4-offset)  dy[3]+=((3*height/4-offset)-height/2)/8.0*4/10;
+        if(dx[4] >= width/4+offset)     dx[4]-=(width/4+offset+width/2)/8/10;//lower left
+        if(dy[4] <= 3*height/4-offset)  dy[4]+=((3*height/4-offset)-(height/2))/8.0*4/10;
     }
     
-    if(dx[1]>=3*width/4-75){//after the circles have been split
+    if(dx[1]>=(3*width/4.0-offset)){//after the circles have been split
       for(int i = 0; i < 5; i++){
         ellipse(dx[i],dy[i],size[i],size[i]);
       }
@@ -187,4 +189,5 @@ void draw(){
       }
     }
   }
+  //saveFrame("#######.png");
 }
